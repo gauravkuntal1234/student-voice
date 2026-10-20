@@ -1,0 +1,17 @@
+{
+  "name": "student-voice-portal",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "dev": "node --env-file-if-exists=.env --watch server.mjs"
+  },
+  "dependencies": {
+    "google-auth-library": "^10.5.0",
+    "nodemailer": "^10.1.2"
+  }
+}

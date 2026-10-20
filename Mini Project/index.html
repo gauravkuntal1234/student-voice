@@ -1875,7 +1875,7 @@
           <article class="portal-card">
             <span class="portal-icon" aria-hidden="true">◎</span>
             <h2>Personal Portal</h2>
-            <p>Your profile details and a quick view of your student information.</p>
+            <p>Start a private chat with an approved faculty member.</p>
             <button class="button portal-button" type="button" data-portal="Personal Portal">Open portal</button>
           </article>
           <article class="portal-card">
@@ -2593,11 +2593,17 @@
             text.className = "message-text";
             text.textContent = message.text;
             body.append(meta, text);
-            if (currentUser.role === "faculty" || currentUser.role === "developer") {
+            const isStaff = currentUser.role === "faculty" || currentUser.role === "developer";
+            const isOwnRecentStudentMessage = currentUser.role === "student" &&
+              message.email?.toLowerCase() === currentUser.email?.toLowerCase() &&
+              Number.isFinite(Number(message.createdAt)) &&
+              Date.now() - Number(message.createdAt) >= 0 &&
+              Date.now() - Number(message.createdAt) <= 5 * 60_000;
+            if (isStaff || isOwnRecentStudentMessage) {
               const remove = document.createElement("button");
               remove.className = "message-remove";
               remove.type = "button";
-              remove.textContent = "Remove message";
+              remove.textContent = "Delete message";
               remove.addEventListener("click", async () => {
                 try {
                   if (serverAuthenticated) {
@@ -3339,35 +3345,6 @@
             directory.querySelectorAll(".teacher-choice")[approvedTeachers.length].click();
           } else if (approvedTeachers.length > 0) {
             directory.querySelector(".teacher-choice").click();
-          }
-          if (currentUser.role === "student") {
-            const profileHeading = document.createElement("h3");
-            profileHeading.textContent = "Your profile";
-            profileHeading.style.margin = "22px 0 0";
-            const profile = document.createElement("dl");
-            profile.className = "portal-profile";
-            const profileValues = {
-              Name: currentUser.name,
-              Email: currentUser.email,
-              "College ID": currentUser.collegeId,
-              Branch: currentUser.branch,
-              Section: currentUser.section,
-              Year: currentUser.year,
-              Gender: currentUser.gender,
-              "Phone number": currentUser.phone,
-              "Date of birth": currentUser.birthDate,
-              City: currentUser.city,
-            };
-            for (const [label, value] of Object.entries(profileValues)) {
-              const item = document.createElement("div");
-              const term = document.createElement("dt");
-              const detail = document.createElement("dd");
-              term.textContent = label;
-              detail.textContent = value;
-              item.append(term, detail);
-              profile.append(item);
-            }
-            workspace.append(profileHeading, profile);
           }
         }
       }
